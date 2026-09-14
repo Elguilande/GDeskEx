@@ -196,31 +196,73 @@ function Get-AndroidAppFromRepo {
 
 # ========== FUNÇÕES DE GERENCIAMENTO DO WSA ==========
 function Install-WSABuilds {
-    Write-ColorOutput "Iniciando instalação do WSABuilds..." "Cyan"
-    $wsaUrl = "https://github.com/MustardChef/WSABuilds/releases/download/Windows_10_2407.40000.4.0_v2/WSA_2407.40000.4.0_x64_Release-Nightly-with-Magisk-28.1.0-Module.7z"
+    Write-ColorOutput "=== Instalação do WSABuilds ===" "Cyan"
+
+    # Detecta se é Windows 10 ou 11
+    $osInfo = Get-CimInstance Win32_OperatingSystem
+    $isWindows11 = $osInfo.Caption -match "Windows 11"
+
+    if ($isWindows11) {
+        Write-ColorOutput "Sistema detectado: Windows 11" "Green"
+        $wsaUrl = "https://github.com/MustardChef/WSABuilds/releases/download/Windows_11_2407.40000.4.0_LTS_8/WSA_2407.40000.4.0_x64_Release-Nightly-with-Magisk-30.6-Stable-MindTheGapps-13.0.7z"
+    } else {
+        Write-ColorOutput "Sistema detectado: Windows 10" "Green"
+        $wsaUrl = "https://github.com/MustardChef/WSABuilds/releases/download/Windows_10_2407.40000.4.0_LTS_8/WSA_2407.40000.4.0_x64_Release-Nightly-with-Magisk-30.6-Stable-MindTheGapps-13.0.7z"
+    }
+
     $tempDir = Join-Path $env:TEMP "WSABuilds"
     $sevenZipUrl = "https://www.7-zip.org/a/7zr.exe"
     $sevenZipPath = Join-Path $tempDir "7zr.exe"
     $archivePath = Join-Path $tempDir "WSA.7z"
     $extractPath = Join-Path $tempDir "Extracted"
-    
-    if (-not (Test-Path $tempDir)) { New-Item -ItemType Directory -Path $tempDir -Force | Out-Null }
+
+    # Cria pasta temporária
+    if (-not (Test-Path $tempDir)) {
+        New-Item -ItemType Directory -Path $tempDir -Force | Out-Null
+    }
+
+    # Baixa 7-Zip se necessário
     if (-not (Test-Path $sevenZipPath)) {
         Write-ColorOutput "Baixando 7-Zip..." "Cyan"
-        Invoke-WebRequest -Uri $sevenZipUrl -OutFile $sevenZipPath -ErrorAction Stop
+        try {
+            Invoke-WebRequest -Uri $sevenZipUrl -OutFile $sevenZipPath -ErrorAction Stop
+        } catch {
+            Write-ColorOutput "Erro ao baixar 7-Zip: $_" "Red"
+            return
+        }
     }
-    Write-ColorOutput "Baixando WSABuilds (pode levar alguns minutos)..." "Cyan"
-    Invoke-WebRequest -Uri $wsaUrl -OutFile $archivePath -ErrorAction Stop
+
+    # Baixa o WSA
+    Write-ColorOutput "Baixando WSABuilds (isso pode demorar vários minutos)..." "Cyan"
+    Write-ColorOutput "URL: $wsaUrl" "Yellow"
+    
+    try {
+        Invoke-WebRequest -Uri $wsaUrl -OutFile $archivePath -ErrorAction Stop
+    } catch {
+        Write-ColorOutput "Erro ao baixar o WSABuilds. Verifique a internet ou o link." "Red"
+        Write-ColorOutput "Erro: $_" "Red"
+        return
+    }
+
+    # Extrai
     Write-ColorOutput "Extraindo arquivos..." "Cyan"
-    if (-not (Test-Path $extractPath)) { New-Item -ItemType Directory -Path $extractPath -Force | Out-Null }
-    & $sevenZipPath x $archivePath -o$extractPath -y | Out-Null
+    if (-not (Test-Path $extractPath)) {
+        New-Item -ItemType Directory -Path $extractPath -Force | Out-Null
+    }
+
+    & $sevenZipPath x $archivePath -o"$extractPath" -y | Out-Null
+
+    # Procura o Run.bat
     $runBat = Get-ChildItem -Path $extractPath -Recurse -Filter "Run.bat" | Select-Object -First 1
+
     if ($runBat) {
         Write-ColorOutput "Executando instalador do WSABuilds..." "Cyan"
-        Start-Process -FilePath $runBat.FullName -Wait -NoNewWindow
-        Write-ColorOutput "Instalação concluída. Reinicie o computador para finalizar." "Green"
+        Write-ColorOutput "Siga as instruções na janela que vai abrir." "Yellow"
+        Start-Process -FilePath $runBat.FullName -Wait
+        Write-ColorOutput "Instalação finalizada. Reinicie o computador se necessário." "Green"
     } else {
-        Write-ColorOutput "Instalador não encontrado dentro do pacote." "Red"
+        Write-ColorOutput "Não foi possível encontrar o instalador (Run.bat)." "Red"
+        Write-ColorOutput "Extraia manualmente a pasta em: $extractPath" "Yellow"
     }
 }
 
