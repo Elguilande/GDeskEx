@@ -26,21 +26,19 @@ O GDeskEx pode ser executado diretamente da internet sem precisar baixar ou inst
 
 ### Usando PowerShell (nativo)
 ```powershell
-powershell -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.com/seuusuario/gdeskex/main/gdeskex.ps1 | iex; gdeskex wsa-status"
+powershell -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.com/Elguilande/gdeskex/main/gdeskex.ps1 | iex; gdeskex wsa-status"
 ```
 
 ### Usando PowerShell (com argumentos)
 Para passar argumentos diretamente, use:
 ```powershell
-$script = Invoke-WebRequest -Uri https://raw.githubusercontent.com/seuusuario/gdeskex/main/gdeskex.ps1 -UseBasicParsing; $scriptBlock = [ScriptBlock]::Create($script.Content); & $scriptBlock wsa-status
+$script = Invoke-WebRequest -Uri https://raw.githubusercontent.com/Elguilande/gdeskex/main/gdeskex.ps1 -UseBasicParsing; $scriptBlock = [ScriptBlock]::Create($script.Content); & $scriptBlock wsa-status
 ```
 
 ### Usando cURL (se disponível)
 ```cmd
-curl -sSL https://raw.githubusercontent.com/seuusuario/gdeskex/main/gdeskex.ps1 | powershell -Command -
+curl -sSL https://raw.githubusercontent.com/Elguilande/gdeskex/main/gdeskex.ps1 | powershell -Command -
 ```
-
-> **Importante:** Substitua `seuusuario` pelo seu nome de usuário do GitHub e `main` pela branch correta.
 
 ---
 
@@ -49,10 +47,10 @@ curl -sSL https://raw.githubusercontent.com/seuusuario/gdeskex/main/gdeskex.ps1 
 Para ter o GDeskEx sempre disponível sem depender da internet, siga os passos abaixo.
 
 ### 1. Baixar o script
-- **Opção A – Manual:** Acesse `https://raw.githubusercontent.com/seuusuario/gdeskex/main/gdeskex.ps1`, clique com botão direito e "Salvar como...".
+- **Opção A – Manual:** Acesse `https://raw.githubusercontent.com/Elguilande/gdeskex/main/gdeskex.ps1`, clique com botão direito e "Salvar como...".
 - **Opção B – PowerShell:**
   ```powershell
-  Invoke-WebRequest -Uri "https://raw.githubusercontent.com/seuusuario/gdeskex/main/gdeskex.ps1" -OutFile "$env:USERPROFILE\Desktop\gdeskex.ps1"
+  Invoke-WebRequest -Uri "https://raw.githubusercontent.com/Elguilande/gdeskex/main/gdeskex.ps1" -OutFile "$env:USERPROFILE\Desktop\gdeskex.ps1"
   ```
 
 ### 2. Permitir execução de scripts locais (uma vez)
@@ -126,7 +124,7 @@ Salve como `gdeskex.bat` em uma pasta do PATH.
 
 ### 4. Instalar um APK baixado da internet
 ```powershell
-.\gdeskex.ps1 install C:\Users\Macovela\Downloads\telegram.apk
+.\gdeskex.ps1 install C:\Users\SeuUsuario\Downloads\telegram.apk
 ```
 
 ### 5. Executar o aplicativo recém‑instalado
@@ -167,7 +165,7 @@ Salve como `gdeskex.bat` em uma pasta do PATH.
 
 O comando `gdeskex get <app-id>` consulta um arquivo JSON hospedado em:
 ```
-https://raw.githubusercontent.com/seuusuario/gdeskex-repo/main/repo.json
+https://raw.githubusercontent.com/Elguilande/gdeskex-repo/main/repo.json
 ```
 
 Formato esperado:
